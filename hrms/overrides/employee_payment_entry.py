@@ -201,11 +201,11 @@ def get_paid_amount_and_received_amount(
 
 
 @frappe.whitelist()
-def get_payment_reference_details(reference_doctype, reference_name, party_account_currency):
+def get_payment_reference_details(reference_doctype, reference_name, party_account_currency, party_type=None, party=None):
 	if reference_doctype in ("Expense Claim", "Employee Advance", "Gratuity"):
 		return get_reference_details_for_employee(reference_doctype, reference_name, party_account_currency)
 	else:
-		return get_reference_details(reference_doctype, reference_name, party_account_currency)
+		return get_reference_details(reference_doctype, reference_name, party_account_currency, party_type, party)
 
 
 @frappe.whitelist()
