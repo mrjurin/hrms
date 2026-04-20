@@ -101,6 +101,25 @@ def get_payment_entry_for_employee(dt, dn, party_amount=None, bank_account=None,
 	pe.paid_amount = paid_amount
 	pe.received_amount = received_amount
 
+	particulars = ""
+
+	if hasattr(doc, "custom_claim_type") and doc.get("custom_claim_type") == 'Medical':
+		# Format particulars as "MEDICAL CLAIM Y2026. KLINIK PERGIGIAN MESRA [MUHD ARRAZIF-28/02/26], ..."
+		# If multiple expense details, use "PATIENT_NAME and others - DATE"
+		# Limit patient name to first 10 characters and remove special characters
+		medical_items = [item for item in doc.expenses if item.expense_type == 'Medical' and item.custom_patient_name]
+		
+		if medical_items:
+			formatted_items = []
+			for item in medical_items:
+				# Clean patient name: first 10 chars, remove special characters
+				patient_name = item.custom_patient_name.split()[0][:10]
+				formatted_items.append(f"[{patient_name}-{item.expense_date.strftime('%d/%m/%y')}]")
+			
+			particulars = f"MEDICAL CLAIM Y{doc.posting_date.year}. " + ", ".join(formatted_items)
+	
+		
+
 	pe.append(
 		"references",
 		{
@@ -111,6 +130,7 @@ def get_payment_entry_for_employee(dt, dn, party_amount=None, bank_account=None,
 			"total_amount": grand_total,
 			"outstanding_amount": outstanding_amount,
 			"allocated_amount": outstanding_amount,
+			"custom_particular": particulars
 		},
 	)
 
