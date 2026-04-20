@@ -120,6 +120,16 @@ def get_payment_entry_for_employee(dt, dn, party_amount=None, bank_account=None,
 	
 		
 
+
+
+
+	import html
+	from frappe.utils import strip_html
+	
+	doc_items = ""
+	if dt == "Expense Claim" and doc.get("expenses"):
+		doc_items = ", ".join([strip_html(html.unescape(i.description)) for i in doc.get("expenses")])
+
 	pe.append(
 		"references",
 		{
